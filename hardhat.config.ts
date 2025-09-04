@@ -10,6 +10,7 @@ import "@nomicfoundation/hardhat-toolbox";
 import "@nomicfoundation/hardhat-ignition";
 import "@nomicfoundation/hardhat-chai-matchers";
 import "@nomicfoundation/hardhat-ignition-ethers";
+import { sep } from "path";
 
 
 dotenv.config();
@@ -41,6 +42,7 @@ const config: HardhatUserConfig = {
   etherscan: {
     enabled: true,
     apiKey: {
+      sepolia: process.env.ETHERSCAN_API_KEY || "",
       ecm: "abc"
     },
     customChains: [
