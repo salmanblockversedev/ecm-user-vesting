@@ -9,6 +9,7 @@
     "test": "hardhat test",
     "test:logs": "hardhat test --trace",
     "watch": "hardhat watch compilation",
+    "flatten": "hardhat flatten contracts/Vestings.sol > flattened/Vestings.sol",
     "deploy:network": "hardhat ignition deploy ignition/modules/vesting.ts --deployment-id ecm-deployment-v1 --network",
     "deploy:verify": "hardhat ignition deploy ignition/modules/vesting.ts --verify --network ",
     "verify:network": "hardhat ignition verify ecm-deployment-v1 --include-unrelated-contracts --network"
