@@ -12,10 +12,6 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 contract ECMcoinVesting is Ownable, ReentrancyGuard {
     // Custom errors
     error InsufficientTokens();
-    error ZeroAddressBeneficiary();
-    error DurationMustBePositive();
-    error AmountMustBePositive();
-    error DurationMustBeGreaterThanCliff();
     error ScheduleNotFound();
     error ScheduleRevoked();
     error NotRevocable();
