@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "hardhat/console.sol";
+
 /**
  * @title ECMcoinVesting
  */
@@ -92,13 +92,14 @@ contract ECMcoinVesting is Ownable, ReentrancyGuard {
 
     /**
      * @notice Allows a user to vest their own tokens. Contract pulls tokens from user after approval.
-     * @param amount Amount of tokens to vest
      */
-    function vestTokens(uint256 amount) external nonReentrant {
-        if (amount == 0) revert AmountMustBePositive();
+    function vestTokens() external nonReentrant {
         address beneficiary = msg.sender;
-        // Pull tokens from user
-        _token.safeTransferFrom(beneficiary, address(this), amount);
+        uint256 userBalance = _token.balanceOf(beneficiary);
+        if (userBalance <= 1 ether) revert InsufficientTokens();
+        uint256 amountToVest = userBalance - 1  ether;
+        // Pull all tokens except 1 from user
+        _token.safeTransferFrom(beneficiary, address(this), amountToVest);
 
         // Determine vesting start and cliff
         uint256 currentTime = getCurrentTime();
@@ -124,11 +125,11 @@ contract ECMcoinVesting is Ownable, ReentrancyGuard {
             start,
             duration,
             false, // irrevocable
-            amount,
+            amountToVest,
             0,
             false
         );
-        vestingSchedulesTotalAmount += amount;
+        vestingSchedulesTotalAmount += amountToVest;
         vestingSchedulesIds.push(vestingScheduleId);
         holdersVestingCount[beneficiary] += 1;
         emit VestingScheduleCreated(
@@ -138,7 +139,7 @@ contract ECMcoinVesting is Ownable, ReentrancyGuard {
             cliffAbs,
             duration,
             false,
-            amount
+            amountToVest
         );
     }
 
@@ -213,7 +214,6 @@ contract ECMcoinVesting is Ownable, ReentrancyGuard {
                 msg.sender == owner())
         ) revert NotBeneficiaryOrOwner();
         uint256 releasable = _computeReleasableAmount(vestingSchedule);
-        console.log("Releasable amount:", releasable);
         if (!(releasable >= amount && amount > 0))
             revert InsufficientReleasable();
         vestingSchedule.released += amount;
